@@ -1,0 +1,83 @@
+#!/bin/bash
+
+#
+# Alias
+#
+alias gitstatus='git status -s '
+alias gitadd='git add '
+alias gitdiff='git diff '
+alias gitdiff-cached='git diff --cached'
+alias gitswitch-main='git switch main'
+alias gitswitch-develop='git switch develop'
+alias gitlog='git log --graph --oneline'
+
+#
+# Init
+#
+gitinit() {
+    git init
+    git switch --orphan main
+    git commit -m ":beginner: origin" --allow-empty --no-verify
+
+    git switch --orphan develop
+    git commit -m ":beginner: origin" --allow-empty --no-verify
+}
+
+#
+# Commit
+#
+# Introducing new features.
+alias gitcommit-newfeatures='COMMITMSG_PREFIX=":sparkles:" git commit '
+
+# Fixing a bug.
+alias gitcommit-fixbug='COMMITMSG_PREFIX=":bug:" git commit '
+
+# Removing code or files.
+alias gitcommit-remove='COMMITMSG_PREFIX=":fire:" git commit '
+
+# Writing docs.
+alias gitcommit-docs='COMMITMSG_PREFIX=":pencil:" git commit '
+
+# Improving structure / format of the code.
+alias gitcommit-format='COMMITMSG_PREFIX=":art:" git commit '
+
+# Introducing breaking changes.
+alias gitcommit-break='COMMITMSG_PREFIX=":boom:" git commit '
+
+# Updating code due to external API changes.
+alias gitcommit-update-externalAPI='COMMITMSG_PREFIX=":alien:" git commit '
+
+# git merge develop to main
+gm2m() {
+    echo "gm2m..."
+
+    branch=$(git describe --contains --all HEAD)
+    if [[ $branch == "main" ]]; then
+        printf "\033[38;5;201m  *main* BRANCH CANNOT BE MARGED TO *main*\033[0m\n"
+        printf "\033[38;5;201m  ABORT...\033[0m\n"
+        return 1
+    fi
+
+    datetime=$(date "+%Y%m%d-%H%M%S.%N")
+
+    git push -u origin develop || return 1
+    git stash push -m "${datetime}" || return 1
+    git checkout main || return 1
+    git merge develop --no-ff --no-edit || return 1
+    git push -u origin main || return 1
+
+    # restore
+    git checkout develop || return 1
+    index=$(git stash list | awk '/'"${datetime}"'$/ { print $0 }' | awk -F ":" '{ print $1 }')
+    if [[ $index != "" ]]; then
+        git stash pop "${index}"
+    fi
+}
+
+#
+# submodule
+#
+
+# bump submodule ALL
+# shellcheck disable=SC2139
+alias bump_submodule="python3 ${HOME}/bin/bump_submodule.py"

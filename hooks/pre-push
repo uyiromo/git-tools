@@ -1,0 +1,34 @@
+#!/bin/bash
+GIT_DIR=$(git rev-parse --absolute-git-dir)
+GIT_TOPDIR=$(git rev-parse --show-toplevel)
+export GIT_DIR
+export GIT_TOPDIR
+
+hooksdir=$(git -C "${GIT_DIR}" config --get "core.hookspath")
+scriptsdir="$(dirname "${hooksdir}")/scripts"
+
+ret=0
+read -r local_ref local_commitid remote_ref remote_commitid
+
+#
+# Submodules must be latest
+#
+"${scriptsdir}"/submodule-checker.py
+ret=$?
+if [[ $ret == 1 ]]; then
+    exit 1
+fi
+printf "\033[38;5;84m[PASS] pre-push (1/2) submodule-checker\033[0m\n"
+
+#
+# Pushed files must be formatted
+#
+"${scriptsdir}"/format-checker.py "${local_ref}" "${local_commitid}" "${remote_ref}" "${remote_commitid}"
+ret=$?
+if [[ $ret == 1 ]]; then
+    exit 1
+fi
+printf "\033[38;5;84m[PASS] pre-push (2/2) format-checker\033[0m\n"
+
+printf "[\033[38;5;84mPASS] pre-push ALL\033[0m\n"
+exit 0

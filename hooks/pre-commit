@@ -1,0 +1,13 @@
+#!/bin/bash
+
+#
+# NO direct commits to _main_ branch
+#
+branch=$( git describe --contains --all HEAD )
+if [[ $branch == "main" ]]
+then
+    printf "\033[38;5;201m*** DIRECT COMMITS TO *main* BRANCH ARE NOT ALLOWED ***\033[0m\n"
+    exit 1
+fi
+
+
