@@ -44,6 +44,9 @@ none = [
 __EOF__
 git add .lfrules.toml
 
+echo ".lfcache.json" >>.gitignore
+git add .gitignore
+
 #
 # Python (flake8, black)
 #

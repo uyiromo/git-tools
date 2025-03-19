@@ -9,6 +9,8 @@ import tomllib
 from fnmatch import fnmatchcase
 from pathlib import Path
 from typing import Dict, List, Callable, Set
+import json
+from hashlib import sha256
 
 from lang import (
     lf_md,
@@ -74,6 +76,17 @@ def main(toplevel: Path, allow_dirty: bool) -> None:
     chdir(toplevel)
 
     #
+    # cache to reduce time
+    #
+    cache_json: Path = toplevel / ".lfcache.json"
+
+    cache: Dict[str, str]
+    if cache_json.exists():
+        cache = json.loads(cache_json.read_text())
+    else:
+        cache = {}
+
+    #
     # Must be clean
     #
     if gitcmd(toplevel, "status --porcelain") and not allow_dirty:
@@ -89,9 +102,7 @@ def main(toplevel: Path, allow_dirty: bool) -> None:
     # Load config file
     #
     config: Path = toplevel / ".lfrules.toml"
-    langmap: Dict[Lang, List[str]] = {
-        Lang(k): v for k, v in tomllib.load(config.open("rb")).items()
-    }
+    langmap: Dict[Lang, List[str]] = {Lang(k): v for k, v in tomllib.load(config.open("rb")).items()}
 
     #
     # Find git controlled files
@@ -110,11 +121,21 @@ def main(toplevel: Path, allow_dirty: bool) -> None:
         if not (p.is_file() and not p.is_symlink()):
             info(f"  skip '{file}'")
         else:
-            lang: Lang = detect_lang(langmap, file)
-            info(f"  lang: {lang}")
+            # if cached, skip
+            digest_cache: str = cache.get(file, "")
+            digest_file: str = sha256(p.read_bytes()).hexdigest()
+            if digest_cache == digest_file:
+                pass
+            else:
+                lang: Lang = detect_lang(langmap, file)
+                info(f"  lang: {lang}")
 
-            lf[lang](toplevel, p)
-            gitcmd(toplevel, f"add {file}")
+                lf[lang](toplevel, p)
+                gitcmd(toplevel, f"add {file}")
+
+                # update cache
+                cache[file] = digest_file
+                cache_json.write_text(json.dumps(cache, indent=4))
 
     #
     # Commit if staged
@@ -132,12 +153,8 @@ def main(toplevel: Path, allow_dirty: bool) -> None:
 
 if __name__ == "__main__":
     parser: ArgumentParser = ArgumentParser()
-    parser.add_argument(
-        "--toplevel", type=Path, required=True, help="Top level directory"
-    )
-    parser.add_argument(
-        "--allow-dirty", action="store_true", help="Allow dirty working directory"
-    )
+    parser.add_argument("--toplevel", type=Path, required=True, help="Top level directory")
+    parser.add_argument("--allow-dirty", action="store_true", help="Allow dirty working directory")
     args: Namespace = parser.parse_args()
 
     # git top level is mounted at /mnt
