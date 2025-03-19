@@ -31,5 +31,6 @@ none = [
   ".gitignore",
   ".gitmodules",
   "*.cron",
-  ".yamlfmt"
+  ".yamlfmt",
+  "LICENSE"
 ]
