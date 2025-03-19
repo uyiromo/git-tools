@@ -38,3 +38,27 @@ GIT_USER_NAME="your name" GIT_USER_EMAIL="your email" ./init.sh
   - check if ALL submodules are up-to-date on `main` branch
   - check if ALL files are formatted and linted
 
+
+## lf
+- linter and formatter
+
+## scripts
+- `submodule-op`
+  - submodule operation script
+- `m2m`
+  - merge to main script
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
