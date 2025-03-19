@@ -39,7 +39,7 @@ def ensure(requirer: str, path: Path) -> None:
 
 def dockercmd(toplevel: Path, cmd: str) -> str:
     tpl: str = str(toplevel)
-    return f'docker run --rm --user $(id -u):$(id -g) -v {tpl}:{tpl}:Z docker-lf /bin/bash -c "{cmd}"'
+    return f'docker run --rm --user $(id -u):$(id -g) -v {tpl}:{tpl}:Z --workdir {tpl} docker-lf /bin/bash -c "{cmd}"'
 
 
 def fmt(toplevel: Path, cmd: str) -> None:
