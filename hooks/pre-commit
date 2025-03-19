@@ -1,0 +1,26 @@
+#!/bin/bash
+set -ue
+set -o pipefail
+
+# info SEAGREEN1
+# shellcheck disable=SC2317
+log_info() {
+    printf "\033[38;5;84m[info] %s\033[0m\n" "$1"
+}
+
+# err MAGENTA
+# shellcheck disable=SC2317
+log_err() {
+    printf "\033[38;5;201m[error] %s\033[0m\n" "$1"
+}
+
+#
+# NO direct commits to _main_ branch
+#
+branch=$(git describe --contains --all HEAD)
+if [[ $branch == "main" ]]; then
+    log_err "*** DIRECT COMMITS TO *main* BRANCH ARE NOT ALLOWED ***"
+    exit 1
+fi
+
+exit 0

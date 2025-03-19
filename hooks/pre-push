@@ -1,0 +1,58 @@
+#!/bin/bash
+set -ue
+set -o pipefail
+
+# info SEAGREEN1
+# shellcheck disable=SC2317
+log_info() {
+    printf "\033[38;5;84mpre-push %s\033[0m\n" "$1"
+}
+
+# err MAGENTA
+# shellcheck disable=SC2317
+log_err() {
+    printf "\033[38;5;201m[error] %s\033[0m\n" "$1"
+}
+
+toplevel=$(git rev-parse --show-toplevel)
+unset GIT_DIR
+
+log_info "toplevel = '${toplevel}'"
+
+#
+# ALL submodules must be MAIN and latest
+#
+log_info "CHECK: submodule status..."
+pushd "${toplevel}"
+
+# shellcheck disable=SC2016
+git submodule foreach "submodule-op --op check --toplevel \$toplevel --path \$path --branch main"
+
+popd >/dev/null
+
+#
+# All files must be formatted/linted before push (all files are older than .lfrules.toml)
+#
+rules_toml="${toplevel}/.lfrules.toml"
+
+log_info "CHECK: lf timestamp..."
+ts0=$(stat -c "%Y" "${rules_toml}")
+
+failed=0
+for file in $(git ls-files); do
+    log_info "  ${file}"
+
+    ts1=$(stat -c "%Y" "${file}")
+    if [[ "${ts1}" -ge "${ts0}" ]]; then
+        log_err "FILE '${file}' MUST BE FORMATTED/LINTED"
+        failed=1
+    fi
+done
+
+if [[ "${failed}" -eq 1 ]]; then
+    exit 1
+fi
+
+log_info "ALL PASS"
+
+exit 0

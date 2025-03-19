@@ -1,0 +1,3 @@
+[submodule "docker-lf"]
+	path = docker-lf
+	url = git@github.com:uyiromo/docker-lf.git
