@@ -37,17 +37,22 @@ def ensure(requirer: str, path: Path) -> None:
     return
 
 
-def fmt(cmd: str) -> None:
-    runcmd(cmd, capture_output=False, check=False)
+def dockercmd(toplevel: Path, cmd: str) -> str:
+    tpl: str = str(toplevel)
+    return f'docker run --rm --user $(id -u):$(id -g) -v {tpl}:{tpl}:Z docker-lf /bin/bash -c "{cmd}"'
+
+
+def fmt(toplevel: Path, cmd: str) -> None:
+    runcmd(dockercmd(toplevel, cmd), capture_output=False, check=False)
     return
 
 
-def lint(cmd: str) -> None:
-    runcmd(cmd, capture_output=False, check=True)
+def lint(toplevel: Path, cmd: str) -> None:
+    runcmd(dockercmd(toplevel, cmd), capture_output=False, check=True)
     return
 
 
-def lf_md(confdir: Path, path: Path) -> None:
+def lf_md(toplevel: Path, path: Path) -> None:
     """Markdown linter/formatter"""
 
     # check config files
@@ -55,80 +60,80 @@ def lf_md(confdir: Path, path: Path) -> None:
 
     # format
     # - markdownlint
-    fmt(f"markdownlint --fix '{str(path)}'")
+    fmt(toplevel, f"markdownlint --fix '{str(path)}'")
 
     # lint
     # - markdownlint
-    lint(f"markdownlint '{str(path)}'")
+    lint(toplevel, f"markdownlint '{str(path)}'")
 
     return
 
 
-def lf_py(confdir: Path, path: Path) -> None:
+def lf_py(toplevel: Path, path: Path) -> None:
     """Python linter/formatter"""
 
     # check config files
-    ensure("black", confdir / "pyproject.toml")
-    ensure("flake8", confdir / ".flake8")
+    ensure("black", toplevel / "pyproject.toml")
+    ensure("flake8", toplevel / ".flake8")
 
     # format
     # - isort
     # - black
-    fmt(f"isort '{str(path)}'")
-    fmt(f"black '{str(path)}'")
+    fmt(toplevel, f"isort '{str(path)}'")
+    fmt(toplevel, f"black '{str(path)}'")
 
     # lint
     # - flake8
-    lint(f"flake8 '{str(path)}'")
+    lint(toplevel, f"flake8 '{str(path)}'")
 
     return
 
 
-def lf_sh(confdir: Path, path: Path) -> None:
+def lf_sh(toplevel: Path, path: Path) -> None:
     """Shell linter/formatter"""
 
     # check config files
-    ensure("shfmt", confdir / ".editorconfig")
+    ensure("shfmt", toplevel / ".editorconfig")
 
     # format
     # - shfmt
-    fmt(f"shfmt -w '{str(path)}'")
+    fmt(toplevel, f"shfmt -w '{str(path)}'")
 
     # lint
     # - shellcheck
     # - shck
-    lint(f"shellcheck '{str(path)}'")
-    lint(f"shck '{str(path)}'")
+    lint(toplevel, f"shellcheck '{str(path)}'")
+    lint(toplevel, f"shck '{str(path)}'")
 
     return
 
 
-def lf_toml(confdir: Path, path: Path) -> None:
+def lf_toml(toplevel: Path, path: Path) -> None:
     """TOML linter/formatter"""
 
     # check config files
-    ensure("taplo", confdir / ".taplo.toml")
+    ensure("taplo", toplevel / ".taplo.toml")
 
     # format
     # - taplo
-    fmt(f"RUST_LOG=error taplo format '{str(path)}'")
+    fmt(toplevel, f"RUST_LOG=error taplo format '{str(path)}'")
 
     # lint
     # - taplo
-    lint(f"RUST_LOG=error taplo lint '{str(path)}'")
+    lint(toplevel, f"RUST_LOG=error taplo lint '{str(path)}'")
 
     return
 
 
-def lf_yaml(confdir: Path, path: Path) -> None:
+def lf_yaml(toplevel: Path, path: Path) -> None:
     """YAML linter/formatter"""
 
     # check config files
-    ensure("yamlfmt", confdir / ".yamlfmt")
+    ensure("yamlfmt", toplevel / ".yamlfmt")
 
     # format
     # - yamlfmt
-    fmt(f"yamlfmt '{str(path)}'")
+    fmt(toplevel, f"yamlfmt '{str(path)}'")
 
     # lint
     pass
@@ -136,7 +141,7 @@ def lf_yaml(confdir: Path, path: Path) -> None:
     return
 
 
-def lf_json(confdir: Path, path: Path) -> None:
+def lf_json(toplevel: Path, path: Path) -> None:
     """JSON linter/formatter"""
 
     # check config files
@@ -144,7 +149,7 @@ def lf_json(confdir: Path, path: Path) -> None:
 
     # format
     # - js-beautify
-    fmt(f"js-beautify --replace --quiet '{str(path)}'")
+    fmt(toplevel, f"js-beautify --replace --quiet '{str(path)}'")
 
     # lint
     pass
@@ -152,24 +157,24 @@ def lf_json(confdir: Path, path: Path) -> None:
     return
 
 
-def lf_javascript(confdir: Path, path: Path) -> None:
+def lf_javascript(toplevel: Path, path: Path) -> None:
     """JavaScript linter/formatter"""
 
     # check config files
-    ensure("eslint", confdir / "eslint.config.mjs")
+    ensure("eslint", toplevel / "eslint.config.mjs")
 
     # format
     # - eslint
-    fmt(f"eslint --fix '{str(path)}'")
+    fmt(toplevel, f"eslint --fix '{str(path)}'")
 
     # lint
     # - eslint
-    lint(f"eslint '{str(path)}'")
+    lint(toplevel, f"eslint '{str(path)}'")
 
     return
 
 
-def lf_dockerfile(confdir: Path, path: Path) -> None:
+def lf_dockerfile(toplevel: Path, path: Path) -> None:
     """Dockerfile linter/formatter"""
 
     # check config files
@@ -179,12 +184,12 @@ def lf_dockerfile(confdir: Path, path: Path) -> None:
     pass
 
     # lint
-    lint(f"hadolint '{str(path)}'")
+    lint(toplevel, f"hadolint '{str(path)}'")
 
     return
 
 
-def lf_none(confdir: Path, path: Path) -> None:
+def lf_none(toplevel: Path, path: Path) -> None:
     """No-op linter/formatter"""
 
     # check config files
