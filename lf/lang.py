@@ -101,9 +101,7 @@ def lf_sh(toplevel: Path, path: Path) -> None:
 
     # lint
     # - shellcheck
-    # - shck
     lint(toplevel, f"shellcheck '{str(path)}'")
-    lint(toplevel, f"shck '{str(path)}'")
 
     return
 
