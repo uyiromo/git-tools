@@ -38,7 +38,8 @@ none = [
   ".gitignore",
   ".gitmodules",
   "*.cron",
-  ".yamlfmt"
+  ".yamlfmt",
+  "LICENSE"
 ]
 __EOF__
 git add .lfrules.toml
