@@ -23,7 +23,7 @@ log_info "toplevel = '${toplevel}'"
 # ALL submodules must be MAIN and latest
 #
 log_info "CHECK: submodule status..."
-pushd "${toplevel}"
+pushd "${toplevel}" >/dev/null
 
 # shellcheck disable=SC2016
 git submodule foreach "submodule-op --op check --toplevel \$toplevel --path \$path --branch main"
@@ -43,7 +43,7 @@ for file in $(git ls-files); do
     log_info "  ${file}"
 
     ts1=$(stat -c "%Y" "${file}")
-    if [[ "${ts1}" -ge "${ts0}" ]]; then
+    if [[ "${ts1}" > "${ts0}" ]]; then
         log_err "FILE '${file}' MUST BE FORMATTED/LINTED"
         failed=1
     fi
