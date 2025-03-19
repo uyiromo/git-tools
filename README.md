@@ -1,14 +1,16 @@
 # git-tools
+
 - my git tools (alias, hooks, scripts)
 
 ## init
+
 ```sh
 GIT_USER_NAME="your name" GIT_USER_EMAIL="your email" ./init.sh
 ```
 
-
 ## git alias
 
+<!-- markdownlint-disable MD013 -->
 | alias | command |
 | --- | --- |
 | `git a` | `git add` |
@@ -28,8 +30,8 @@ GIT_USER_NAME="your name" GIT_USER_EMAIL="your email" ./init.sh
 | `git bumpall` | `git submodule foreach "git -C \$toplevel bump \$path"` |
 | `git m2m` | `m2m` |
 
-
 ## git hooks
+
 - `hooks/commit-msg`
   - insert specified emojis to commit message
 - `hooks/pre-commit`
@@ -38,27 +40,13 @@ GIT_USER_NAME="your name" GIT_USER_EMAIL="your email" ./init.sh
   - check if ALL submodules are up-to-date on `main` branch
   - check if ALL files are formatted and linted
 
-
 ## lf
+
 - linter and formatter
 
 ## scripts
+
 - `submodule-op`
   - submodule operation script
 - `m2m`
   - merge to main script
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -4,11 +4,10 @@ from __future__ import annotations
 """Git submodule operator"""
 
 from argparse import ArgumentParser, Namespace
+from logging import ERROR, INFO, Logger, StreamHandler, getLogger
 from pathlib import Path
-from sys import exit
 from subprocess import run
-
-from logging import getLogger, Logger, StreamHandler, INFO, ERROR
+from sys import exit
 
 
 class ColoredStreamHandler(StreamHandler):
@@ -34,9 +33,7 @@ lg.addHandler(ColoredStreamHandler())
 
 def gitcmd(repodir: Path, cmd: str) -> str:
     """git -C _repodir_ _cmd_"""
-    return run(
-        f"git -C '{str(repodir)}' {cmd}", shell=True, capture_output=True, text=True
-    ).stdout.rstrip()
+    return run(f"git -C '{str(repodir)}' {cmd}", shell=True, capture_output=True, text=True).stdout.rstrip()
 
 
 def check(toplevel: Path, path: Path, branch: str) -> bool:
@@ -126,12 +123,8 @@ def bump(toplevel: Path, path: Path, branch: str) -> bool:
 
 if __name__ == "__main__":
     parser: ArgumentParser = ArgumentParser()
-    parser.add_argument(
-        "--op", type=str, choices=["check", "bump"], required=True, help="operation"
-    )
-    parser.add_argument(
-        "--toplevel", type=Path, required=True, help="`git rev-parse--show-toplevel`"
-    )
+    parser.add_argument("--op", type=str, choices=["check", "bump"], required=True, help="operation")
+    parser.add_argument("--toplevel", type=Path, required=True, help="`git rev-parse--show-toplevel`")
     parser.add_argument("--path", type=Path, required=True, help="submodule path")
     parser.add_argument("--branch", type=str, required=True, help="expected branch")
     args: Namespace = parser.parse_args()

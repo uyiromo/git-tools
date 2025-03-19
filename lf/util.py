@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from hashlib import sha256
 from pathlib import Path
-from subprocess import run, CompletedProcess
-
+from subprocess import CompletedProcess, run
 from typing import Optional
 
 

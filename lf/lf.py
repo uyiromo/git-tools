@@ -3,29 +3,17 @@ from __future__ import annotations
 
 """lf (linter/formatter) frontend"""
 
-from os import chdir
-from argparse import ArgumentParser, Namespace
-import tomllib
-from fnmatch import fnmatchcase
-from pathlib import Path
-from typing import Dict, List, Callable, Set
 import json
+import tomllib
+from argparse import ArgumentParser, Namespace
+from fnmatch import fnmatchcase
 from hashlib import sha256
+from os import chdir
+from pathlib import Path
+from typing import Callable, Dict, List, Set
 
-from lang import (
-    lf_md,
-    lf_py,
-    lf_sh,
-    lf_toml,
-    lf_yaml,
-    lf_json,
-    lf_javascript,
-    lf_dockerfile,
-    Lang,
-    lf_none,
-)
-from util import runcmd, info, err
-
+from lang import Lang, lf_dockerfile, lf_javascript, lf_json, lf_md, lf_none, lf_py, lf_sh, lf_toml, lf_yaml
+from util import err, info, runcmd
 
 lf: Dict[Lang, Callable[[Path, Path], None]] = {
     Lang.md: lf_md,
