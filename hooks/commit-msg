@@ -1,0 +1,18 @@
+#!/bin/bash
+set -ue
+set -o pipefail
+
+#
+# Add COMMITMSG_PREFIX the commit message title
+#
+if [[ -v COMMITMSG_PREFIX ]]; then
+    COMMIT_EDITMSG="$1"
+
+    # use nanoseconds in the temporary file name to avoid conflicts
+    datetime=$(date "+%Y%m%d-%H%M%S.%N")
+    COMMIT_EDITMSG_TMP="/tmp/COMMIT_EDITMSG.${datetime}"
+    echo -n "${COMMITMSG_PREFIX} " | cat - "${COMMIT_EDITMSG}" >"${COMMIT_EDITMSG_TMP}"
+    mv "${COMMIT_EDITMSG_TMP}" "${COMMIT_EDITMSG}"
+fi
+
+exit 0
