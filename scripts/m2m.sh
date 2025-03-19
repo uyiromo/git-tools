@@ -22,7 +22,7 @@ gitcmd() {
 log_info "m2m..."
 
 # check args
-if [[ "${1}" == "--no-verity" ]]; then
+if [[ $# == 2 && "${1}" == "--no-verity" ]]; then
     no_verify="--no-verify"
 else
     no_verify=""
