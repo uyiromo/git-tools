@@ -43,7 +43,7 @@ for file in $(git ls-files); do
     log_info "  ${file}"
 
     ts1=$(stat -c "%Y" "${file}")
-    if [[ "${ts1}" > "${ts0}" ]]; then
+    if [[ -f "${file}" && "${ts1}" > "${ts0}" ]]; then
         log_err "FILE '${file}' MUST BE FORMATTED/LINTED"
         failed=1
     fi
