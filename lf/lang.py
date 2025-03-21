@@ -75,6 +75,7 @@ def lf_py(toplevel: Path, path: Path) -> None:
     # check config files
     ensure("black", toplevel / "pyproject.toml")
     ensure("flake8", toplevel / ".flake8")
+    ensure("mypy", toplevel / "pyproject.toml")
 
     # format
     # - isort
@@ -84,7 +85,9 @@ def lf_py(toplevel: Path, path: Path) -> None:
 
     # lint
     # - flake8
+    # - mypy
     lint(toplevel, f"flake8 '{str(path)}'")
+    lint(toplevel, f"mypy '{str(path)}'")
 
     return
 
